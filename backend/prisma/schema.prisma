@@ -1,0 +1,131 @@
+// backend/prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  MORADOR
+  ADMIN
+  PORTEIRO
+  RECEPCIONISTA
+  RONDA_DIURNO
+  RONDA_NOTURNO
+  ZELADOR
+}
+
+enum TipoEncomenda {
+  CARTA
+  CAIXA_PEQUENA
+  CAIXA_MEDIA
+  CAIXA_GRANDE
+  ENVELOPE
+  OUTROS
+}
+
+enum StatusEncomenda {
+  PENDENTE
+  RETIRADA
+  DEVOLVIDA
+}
+
+model Usuario {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  senha         String
+  nome          String
+  cpf           String   @unique
+  telefone      String
+  role          UserRole @default(MORADOR)
+  ativo         Boolean  @default(true)
+  criadoEm      DateTime @default(now())
+  atualizadoEm  DateTime @updatedAt
+
+  // Relacionamentos
+  morador       Morador?
+  funcionario   Funcionario?
+  notificacoes  Notificacao[]
+
+  @@map("usuarios")
+}
+
+model Morador {
+  id            String   @id @default(uuid())
+  usuarioId     String   @unique
+  torre         String   // "A" ou "B"
+  andar         Int      // 1 a 23
+  apartamento   Int      // 1 a 8
+  dataIngresso  DateTime @default(now())
+  criadoEm      DateTime @default(now())
+  atualizadoEm  DateTime @updatedAt
+
+  // Relacionamentos
+  usuario       Usuario     @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  encomendas    Encomenda[]
+
+  @@unique([torre, andar, apartamento])
+  @@map("moradores")
+}
+
+model Funcionario {
+  id            String   @id @default(uuid())
+  usuarioId     String   @unique
+  cargo         UserRole
+  dataAdmissao  DateTime @default(now())
+  criadoEm      DateTime @default(now())
+  atualizadoEm  DateTime @updatedAt
+
+  // Relacionamentos
+  usuario               Usuario     @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  encomendasRegistradas Encomenda[] @relation("FuncionarioRegistro")
+
+  @@map("funcionarios")
+}
+
+model Encomenda {
+  id                String          @id @default(uuid())
+  moradorId         String
+  registradoPorId   String
+  tipo              TipoEncomenda
+  descricao         String?
+  imagemUrl         String?
+  status            StatusEncomenda @default(PENDENTE)
+  dataChegada       DateTime        @default(now())
+  dataRetirada      DateTime?
+  observacoes       String?
+  criadoEm          DateTime        @default(now())
+  atualizadoEm      DateTime        @updatedAt
+
+  // Relacionamentos
+  morador           Morador      @relation(fields: [moradorId], references: [id], onDelete: Cascade)
+  registradoPor     Funcionario  @relation("FuncionarioRegistro", fields: [registradoPorId], references: [id])
+  notificacoes      Notificacao[]
+
+  @@index([moradorId, status])
+  @@index([dataChegada])
+  @@map("encomendas")
+}
+
+model Notificacao {
+  id            String   @id @default(uuid())
+  usuarioId     String
+  encomendaId   String?
+  titulo        String
+  mensagem      String
+  lida          Boolean  @default(false)
+  tipo          String   @default("ENCOMENDA") // ENCOMENDA, LEMBRETE, SISTEMA
+  criadoEm      DateTime @default(now())
+
+  // Relacionamentos
+  usuario       Usuario    @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  encomenda     Encomenda? @relation(fields: [encomendaId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId, lida])
+  @@index([criadoEm])
+  @@map("notificacoes")
+}
