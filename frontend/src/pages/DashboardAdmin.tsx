@@ -285,7 +285,7 @@ export default function DashboardAdmin() {
                         <select
                           value={formEncomenda.moradorId}
                           onChange={(e) => setFormEncomenda({...formEncomenda, moradorId: e.target.value})}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                          className="w-80 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                           required
                         >
                           <option value="">Selecione o morador</option>
@@ -302,7 +302,7 @@ export default function DashboardAdmin() {
                         <select
                           value={formEncomenda.tipo}
                           onChange={(e) => setFormEncomenda({...formEncomenda, tipo: e.target.value})}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                          className="w-50 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                           required
                         >
                           <option value="CARTA">Carta</option>
@@ -393,7 +393,7 @@ export default function DashboardAdmin() {
                         value={busca}
                         onChange={(e) => setBusca(e.target.value)}
                         placeholder="Buscar por nome ou apartamento..."
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="w-105 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                       />
                     </div>
                   </div>
@@ -479,7 +479,7 @@ export default function DashboardAdmin() {
                       value={busca}
                       onChange={(e) => setBusca(e.target.value)}
                       placeholder="Buscar morador..."
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                      className="w-190 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                     />
                   </div>
                 </div>
