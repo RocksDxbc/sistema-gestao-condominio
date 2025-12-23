@@ -1,35 +1,85 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import Login from './pages/Login';
+import CadastroMorador from './pages/CadastroMorador';
+import DashboardMorador from './pages/DashboardMorador';
+import DashboardAdmin from './pages/DashboardAdmin';
 
-function App() {
-  const [count, setCount] = useState(0)
+const PrivateRoute = ({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: string[] }) => {
+  const { usuario, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (!usuario) {
+    return <Navigate to="/login" />;
+  }
+
+  if (allowedRoles && !allowedRoles.includes(usuario.role)) {
+    return <Navigate to="/" />;
+  }
+
+  return <>{children}</>;
+};
+
+function AppRoutes() {
+  const { usuario } = useAuth();
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/cadastro" element={<CadastroMorador />} />
+      
+      <Route
+        path="/morador/*"
+        element={
+          <PrivateRoute allowedRoles={['MORADOR']}>
+            <DashboardMorador />
+          </PrivateRoute>
+        }
+      />
+      
+      <Route
+        path="/admin/*"
+        element={
+          <PrivateRoute allowedRoles={['ADMIN', 'PORTEIRO', 'RECEPCIONISTA', 'RONDA_DIURNO', 'RONDA_NOTURNO', 'ZELADOR']}>
+            <DashboardAdmin />
+          </PrivateRoute>
+        }
+      />
+      
+      <Route
+        path="/"
+        element={
+          usuario ? (
+            usuario.role === 'MORADOR' ? (
+              <Navigate to="/morador" />
+            ) : (
+              <Navigate to="/admin" />
+            )
+          ) : (
+            <Navigate to="/login" />
+          )
+        }
+      />
+    </Routes>
+  );
 }
 
-export default App
+function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </BrowserRouter>
+  );
+}
+
+export default App;
