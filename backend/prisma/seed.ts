@@ -1,4 +1,4 @@
-// backend/prisma/seed.ts
+// backend/prisma/seed.ts  - POPULAR BANCO DE DADOS INCIAL PADRÃO
 
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
