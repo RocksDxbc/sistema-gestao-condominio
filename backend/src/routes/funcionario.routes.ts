@@ -1,4 +1,3 @@
-// ============================================
 // backend/src/routes/funcionario.routes.ts
 
 import { Router as RouterFunc } from 'express';

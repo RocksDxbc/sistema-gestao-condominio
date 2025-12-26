@@ -156,8 +156,8 @@ npm start
    - Linux/Mac: `ifconfig`
 
 2. Acessar de outros dispositivos na mesma rede:
-   - Backend: `http://SEU_IP:3001`
-   - Frontend: `http://SEU_IP:3000`
+   - Backend: `http://SEU_IP:3001` - 192.168.0.245
+   - Frontend: `http://SEU_IP:3000` - 192.168.0.245 - http://192.168.0.245:3000
 
 ## 🐛 Problemas Comuns
 
